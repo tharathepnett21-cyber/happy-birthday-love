@@ -702,7 +702,6 @@ body {
 const PASSWORD = '270749';
 const TOTAL_PAGES = 4;
 let currentPage = 0;
-const isUnlocked = localStorage.getItem('hbdUnlocked') === 'true';
 
 const lockScreen = document.getElementById('lockScreen');
 const mainContent = document.getElementById('mainContent');
@@ -723,18 +722,6 @@ for (let i = 0; i < TOTAL_PAGES; i++) {
   const dot = document.createElement('div');
   dot.className = 'page-dot' + (i === 0 ? ' active' : '');
   pageDots.appendChild(dot);
-}
-
-// Restore state on refresh
-if (isUnlocked) {
-  lockScreen.classList.add('hidden');
-  mainContent.classList.add('show');
-  navBar.classList.add('show');
-  floatingDisc.classList.add('show');
-  currentPage = 0;
-  pages.forEach((p, i) => p.classList.toggle('active', i === 0));
-  updateNav();
-  createHearts();
 }
 
 function updateNav() {
@@ -797,8 +784,6 @@ function openEnvelope() {
   audio.load();
   audio.play().then(() => { floatingDisc.classList.add('playing'); }).catch(() => {});
   lockScreen.classList.add('hidden');
-  localStorage.setItem('hbdUnlocked', 'true');
-  localStorage.setItem('hbdPage', '0');
   setTimeout(() => {
     mainContent.classList.add('show');
     navBar.classList.add('show');
