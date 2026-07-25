@@ -363,7 +363,7 @@ body {
 .tl-item:hover .tl-photos img { transform: scale(1.05); }
 
 /* ========== PAGE 4: LETTER ========== */
-[data-page="3"] { justify-content: center; }
+[data-page="3"] { justify-content: flex-start; padding-top: 40px; }
 .letter-envelope {
   position: relative; cursor: pointer;
   animation: heroIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
@@ -443,7 +443,7 @@ body {
   backdrop-filter: blur(16px);
   border-radius: 18px; padding: 28px 24px 24px;
   box-shadow: 0 12px 48px rgba(0,0,0,0.3), 0 2px 8px rgba(236,64,122,0.05);
-  position: relative; overflow: hidden;
+  position: relative; overflow: visible;
   animation: paperIn 0.8s cubic-bezier(0.22,1,0.36,1) both;
   border: 1px solid rgba(236,64,122,0.12);
 }
@@ -516,11 +516,15 @@ body {
 /* ========== RESPONSIVE ========== */
 @media (max-width: 600px) {
   .wishes { gap: 8px; }
-  .page { padding: 50px 16px 80px; }
+  .page { padding: 40px 16px 80px; }
   .tl-content { width: 100%; }
   .timeline::before { left: 14px; }
   .tl-item, .tl-item:nth-child(odd) { flex-direction: row; padding-left: 36px; }
   .tl-dot { left: 14px; }
+  .p1-hero { width: 85vw; height: 35vh; margin-top: 10px; }
+  .p1-msg { padding: 20px 16px; }
+  .p1-msg p { font-size: 14px; }
+  .letter-paper { width: 90vw; padding: 24px 18px; }
 }
 
 ::-webkit-scrollbar { width: 4px; }
