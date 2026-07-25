@@ -207,11 +207,12 @@ body {
 /* ========== NAVIGATION ========== */
 .nav-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 20px; z-index: 100;
+  display: none; align-items: center; justify-content: space-between;
+  padding: 12px 20px; z-index: 999;
   background: linear-gradient(transparent, rgba(42,16,32,0.95) 30%);
   backdrop-filter: blur(8px);
 }
+.nav-bar.show { display: flex; }
 
 .nav-btn {
   padding: 10px 24px; border: none; border-radius: 24px;
@@ -578,7 +579,7 @@ body {
       <span class="age-number" id="ageNumber">20</span>
       <span class="age-label">เป็นผู้ใหญ่แล้วว</span>
     </div>
-    <h2 class="p1-name">PunPun 
+    <h2 class="p1-name">PunPun</h2>
     <div class="p1-msg">
       <p>วันนี้เป็นวันที่พิเศษที่สุด 💖</p>
       <p>เพราะเป็นวันเกิดปันเน็ทเลยทำเว็ปนี้ขึ้นมา</p>
@@ -685,24 +686,27 @@ body {
     </div>
   </div>
 
-  <!-- NAV BAR -->
-  <div class="nav-bar">
-    <button class="nav-btn prev hidden" id="prevBtn">← กลับ</button>
-    <div class="page-dots" id="pageDots"></div>
-    <button class="nav-btn next" id="nextBtn">ถัดไป →</button>
   </div>
 
   <audio id="audio" src="music/music.mp3" preload="auto" loop></audio>
 </div>
 
+<!-- NAV BAR (outside mainContent for Android compat) -->
+<div class="nav-bar" id="navBar">
+  <button class="nav-btn prev hidden" id="prevBtn">← กลับ</button>
+  <div class="page-dots" id="pageDots"></div>
+  <button class="nav-btn next" id="nextBtn">ถัดไป →</button>
+</div>
+
 <script>
 const PASSWORD = '270749';
 const TOTAL_PAGES = 4;
-let currentPage = parseInt(localStorage.getItem('hbdPage') || '0');
+let currentPage = 0;
 const isUnlocked = localStorage.getItem('hbdUnlocked') === 'true';
 
 const lockScreen = document.getElementById('lockScreen');
 const mainContent = document.getElementById('mainContent');
+const navBar = document.getElementById('navBar');
 const pwInput = document.getElementById('pwInput');
 const openBtn = document.getElementById('openBtn');
 const pwError = document.getElementById('pwError');
@@ -725,11 +729,11 @@ for (let i = 0; i < TOTAL_PAGES; i++) {
 if (isUnlocked) {
   lockScreen.classList.add('hidden');
   mainContent.classList.add('show');
+  navBar.classList.add('show');
   floatingDisc.classList.add('show');
-  pages.forEach((p, i) => p.classList.toggle('active', i === currentPage));
+  currentPage = 0;
+  pages.forEach((p, i) => p.classList.toggle('active', i === 0));
   updateNav();
-  audio.load();
-  audio.play().then(() => floatingDisc.classList.add('playing')).catch(() => {});
   createHearts();
 }
 
@@ -749,7 +753,6 @@ function goToPage(dir) {
 
   currentPage = Math.max(0, Math.min(TOTAL_PAGES - 1, currentPage + dir));
   pages[currentPage].classList.add('active');
-  localStorage.setItem('hbdPage', currentPage);
   updateNav();
 }
 
@@ -792,18 +795,18 @@ function openEnvelope() {
     return;
   }
   audio.load();
-  audio.play().then(() => { floatingDisc.classList.add('playing'); }).catch(() => {
-    setTimeout(() => { audio.play().then(() => { floatingDisc.classList.add('playing'); }).catch(() => {}); }, 300);
-  });
+  audio.play().then(() => { floatingDisc.classList.add('playing'); }).catch(() => {});
   lockScreen.classList.add('hidden');
   localStorage.setItem('hbdUnlocked', 'true');
   localStorage.setItem('hbdPage', '0');
   setTimeout(() => {
     mainContent.classList.add('show');
+    navBar.classList.add('show');
     floatingDisc.classList.add('show');
     launchConfetti();
     createHearts();
   }, 400);
+}
 }
 
 openBtn.addEventListener('click', openEnvelope);
@@ -871,7 +874,8 @@ let gsTimer = setInterval(gsNext, 3500);
 
 // Music - floating disc
 floatingDisc.addEventListener('click', () => {
-  if (audio.paused) { audio.play(); floatingDisc.classList.add('playing'); }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (audio.paused) { audio.play().then(() => floatingDisc.classList.add('playing')).catch(() => {}); }
   else { audio.pause(); floatingDisc.classList.remove('playing'); }
 });
 audio.addEventListener('ended', () => { audio.currentTime = 0; audio.play(); });
